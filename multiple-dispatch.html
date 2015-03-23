@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
-        <title>Brainscrape</title>
+        <title>Multiple Dispatch for the Masses</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
@@ -15,13 +15,18 @@
                 <h1><a href="/">Brainscrape </a></h1>
                 <nav><ul>
                     <li><a href="/pages/multiple-dispatch-for-the-masses.html">Multiple Dispatch for the Masses</a></li>
-                    <li><a href="/category/misc.html">misc</a></li>
+                    <li class="active"><a href="/category/misc.html">misc</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/multiple-dispatch.html" rel="bookmark"
+           title="Permalink to Multiple Dispatch for the Masses">Multiple Dispatch for the Masses</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/multiple-dispatch.html">Multiple Dispatch for the Masses</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2015-03-18T00:00:00+01:00">
                 Published: Wed 18 March 2015
@@ -32,7 +37,7 @@
         </address>
 <p>In <a href="/category/misc.html">misc</a>. </p>
 
-</footer><!-- /.post-info --><p>Popular modern day languages have progressed from predominatly procedural/imperative to single dispatch object oriented.  Most mainstream languages also incorporate functional and generic programming to a limited extent as well. We will worry only about the most common subset of features for this article.</p>
+</footer><!-- /.post-info -->      <p>Popular modern day languages have progressed from predominatly procedural/imperative to single dispatch object oriented.  Most mainstream languages also incorporate functional and generic programming to a limited extent as well. We will worry only about the most common subset of features for this article.</p>
 <p>The most common methods of dealing with multiple dispatch using these features will be shown.  Keep in mind that these have been discovered through my own research and experience, so read through this with a critical mind, and be sure to diversify your sources on this topic.  Also, please note that the criticism sections following each approach will be loaded with the author's opinion, not actual facts.</p>
 <p>This entry will utilize two languages with which most programmers will have at least a passing familiarity: C and Java.</p>
 <p>As a final note, it is important to understand that each of these techniques are fundamentally different.  While in many cases they are interchangable, there are instances where they are not.  For example, table based solutions allow the branching logic to be modified at runtime, while switch and object based solutions do not <strong>inherently</strong> support this.</p>
@@ -205,11 +210,11 @@
 <p>This is a blockquote.</p>
 <p>This is the second paragraph in the blockquote.</p>
 <h2>This is an H2 in a blockquote</h2>
-</blockquote>                </article>
-<p class="paginator">
-    Page 1 / 1
-</p>
-            </aside><!-- /#featured -->
+</blockquote>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>blogroll</h2>

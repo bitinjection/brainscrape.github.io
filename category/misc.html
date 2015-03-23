@@ -32,19 +32,20 @@
         </address>
 <p>In <a href="http://brainscrape.github.io/category/misc.html">misc</a>. </p>
 
-</footer><!-- /.post-info --><p>Popular modern day languages have progressed from predominatly procedural/imperative to single dispatch object oriented.  Most mainstream languages also incorporate functional and generic programming to a limited extent as well. We will worry only about the most common subset of features for this article.</p>
-<p>The most common methods of dealing with multiple dispatch using these features will be shown.  Keep in mind that these have been discovered through my own research and experience, so read through this with a critical mind, and be sure to diversify your sources on this topic.  Also, please note that the criticism sections following each approach will be loaded with the author's opinion, not actual facts.</p>
+</footer><!-- /.post-info --><p>Popular modern day languages have progressed from predominantly procedural/imperative to single dispatch object oriented.  Most mainstream languages also incorporate functional and generic programming to a limited extent as well. We will worry only about the most common subset of features for this article.</p>
+<p>The most common methods of dealing with multiple dispatch using these features will be shown.  These have been discovered through my own research and experience. Read through this with a critical mind, and be sure to diversify your sources on this topic.  The criticism sections following each approach will be the author's opinion, not actual facts.</p>
 <p>This entry will utilize two languages with which most programmers will have at least a passing familiarity: C and Java.</p>
-<p>As a final note, it is important to understand that each of these techniques are fundamentally different.  While in many cases they are interchangable, there are instances where they are not.  For example, table based solutions allow the branching logic to be modified at runtime, while switch and object based solutions do not <strong>inherently</strong> support this.</p>
+<p>Each of these techniques are fundamentally different.  While in many cases they are interchangable, there are instances where they are not.  For example, table based solutions allow the branching logic to be modified at runtime, while switch and object based solutions do not <strong>inherently</strong> support this.</p>
+<p>I have included source code to demonstrate each of these approaches.  Code is provided in C or Java, depending on the features needed for each technique.  The article is written without referencing the code directly to allow both the code and article to exist independently.</p>
 <h1>What is Multiple Dispatch?</h1>
-<p>Code is often written against abstractions.  These abstractions are helpful in the development process, but they all must eventually be resolved to a concrete type in order to do actual work.</p>
+<p>Code is often written against abstractions.  Abstractions are helpful in the development process, but they all must eventually be resolved to a concrete type in order to do actual work.</p>
 <h2>A Single Dispatch Example</h2>
-<p>As a quick example from an object oriented language, an <code>Animal</code> abstraction may provide a <code>speak</code> method.  A programmer may write</p>
+<p>As an example from an object oriented language, an <code>Animal</code> abstraction may provide a <code>speak</code> method.  A programmer may write</p>
 <div class="highlight"><pre><span class="n">animal</span><span class="o">.</span><span class="na">speak</span><span class="o">();</span>
 </pre></div>
 
 
-<p>This line of code has no real meaning, though.  If an Animal is a purely abstract object, then its <code>speak</code> method will have no actual code.  At runtime, the program will dynamically dispatch to object's underlying type and call that object's <code>speak</code> method.  In other words, if the abstract <code>animal</code> object points to an instance of <code>Dog</code> class, then the above call may print <code>woof</code> to the screen.  The above call might effectively be translated to</p>
+<p>If an Animal is a purely abstract object, then its <code>speak</code> method will have no actual code.  At runtime, the program will dynamically dispatch to object's underlying type and call that object's <code>speak</code> method.  If the abstract <code>animal</code> object points to an instance of <code>Dog</code> class, then the above call may print <code>woof</code> to the screen.  The above call might effectively be translated to</p>
 <div class="highlight"><pre><span class="n">dog</span><span class="o">.</span><span class="na">speak</span><span class="o">();</span>  <span class="c1">// prints &quot;woof&quot;</span>
 </pre></div>
 
@@ -56,9 +57,9 @@
 </pre></div>
 
 
-<p>As an example, attacker1 might be resolved to <code>Rock</code> and attacker2 might be resolved to <code>Scissors</code>.  In this case, the code relating to rock beating scissors would be called.</p>
+<p><code>attacker1</code> might be resolved to <code>Rock</code> and <code>attacker2</code> might be resolved to <code>Scissors</code>.  In this case, the code relating to rock beating scissors would be called.</p>
 <h1>Multiple Dispatch in C</h1>
-<p>There are two main ways to go about this in C.  Both of these involve defining types which explicitly describe themselves.  In other words, an enum may be defined as</p>
+<p>There are two main ways to go about this in C.  Both of these involve defining types which explicitly describe themselves.  An enum may be defined as</p>
 <div class="highlight"><pre><span class="k">enum</span> <span class="p">{</span> <span class="n">ROCK</span><span class="p">,</span> <span class="n">PAPER</span><span class="p">,</span> <span class="n">SCISSORS</span><span class="p">}</span> <span class="n">attacker</span><span class="p">;</span>
 </pre></div>
 
@@ -86,7 +87,7 @@
 </pre></div>
 
 
-<p>This switch statement ends up being huge, even with only three types.</p>
+<p>This switch statement ends up being huge with only three types, and the complexity grows exponentially as types are added.</p>
 <p>Beyond factoring each switch and/or case statement into its own function, the switch statement itself may be replaced with a jump table.</p>
 <h3>Criticisms</h3>
 <p>Good</p>
@@ -97,11 +98,11 @@
 <ul>
 <li>Adding/removing types requires a lot of work which won't be verified by a compiler</li>
 <li>Have to add a type field to all types and keep up with these</li>
-<li>These switch statements tend to poliferate</li>
+<li>Switch statements tend to poliferate</li>
 </ul>
 <p>The first bullet under the negative criticisms is particularly important.  Adding or removing types involves modifying a lot of code spread out all over your program, and the compiler will not let you know if you have left anything out in many cases.</p>
 <h2>Big Jump Table</h2>
-<p>The logic of a switch statement or chain of if/else statements based on explicitly defined types may be replaced by a jump table.  Before diving into the code, imagine a matrix of possible outcomes for the game itself</p>
+<p>The logic of a switch statement or chain of if/else statements based on explicitly defined types may be replaced by a jump table.  Imagine a matrix of possible outcomes for the game itself</p>
 <table>
 <thead>
 <tr>
@@ -152,9 +153,11 @@
 </ul>
 <p>Again, the first bullet above is worth reading over again.</p>
 <h1>Introspection</h1>
-<p>While finding a language or environment in which introspection is unavailable is not unheard of, reflection is commonly used to help alleviate some of the issues with the C-based approaches to this problem.</p>
+<p>Introspection may be used to help alleviate some of the issues with the C-based approaches to this problem when applicable.</p>
 <p>Instead of manually tracking each type, the underlying type of each abstraction is determined via a language's introspection features, and then the relevant code is dispatched to based on the findings.</p>
-<p>As a side note, this approach is often times discovered independently and immediatelly touted as a panacea for the ugly switch/table based methods previously described, and the also ugly double indirection used in object oriented languages.  It is my opinion that it is not.  While it does simplify some aspects of the table-based approach, it still carries many of the drawbacks associated with that method, and it introduces many of its own drawbacks in the process.  These will be detailed in the general compare/contrast of each method toward the end.</p>
+<blockquote>
+<p>As a side note, this approach is often times discovered independently and immediatelly touted as a panacea for the ugly switch/table based methods previously described, and the also ugly object-based double indirection used in object oriented languages (described in a moment).  It is my opinion that it is not.  While it does simplify some aspects of the table-based approach, it still carries many of the drawbacks associated with that method, and it introduces many of its own drawbacks in the process.  These will be detailed in the general compare/contrast of each method toward the end.</p>
+</blockquote>
 <h2>Criticisms</h2>
 <p>Good</p>
 <ul>
@@ -166,7 +169,7 @@
 <li>While explicit tracking of types is removed, the developer must still be mentally aware of what these types are when updating tables.</li>
 </ul>
 <h1>Object Oriented Approach</h1>
-<p>In object oriented languages, polymorphism is the go-to mechanism for replacing branches based on type.  To implement double dispatch, then, one can first write something along the lines of</p>
+<p>In object oriented languages, polymorphism is the go-to mechanism for replacing branches based on type.  To implement double dispatch, one can first write something along the lines of</p>
 <div class="highlight"><pre><span class="n">attacker1</span><span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="n">attacker2</span><span class="o">);</span>
 </pre></div>
 
@@ -186,7 +189,7 @@
 </pre></div>
 
 
-<p>And in our Paper class, the handleRock method can contain the code which handles the rock versus paper interaction.</p>
+<p>And in our Paper class, the handleRock method can contain the code which handles the rock versus paper interaction.  Function overloading is often used during this second dispatch, but it is not necessary for the language to support overloading for this technique to work.</p>
 <h2>Criticisms</h2>
 <p>Good</p>
 <ul>
@@ -200,12 +203,41 @@
 <li>Costs associated with adding/removing types vary based on which set of types you are modifying</li>
 </ul>
 <p>I will spend the second half of this article examining this object oriented approach, as I find it to be heavily criticized in ways which I think are unfair.  If the above bullets are not clear, feel free to read on.</p>
-<h3>Header 3</h3>
-<blockquote>
-<p>This is a blockquote.</p>
-<p>This is the second paragraph in the blockquote.</p>
-<h2>This is an H2 in a blockquote</h2>
-</blockquote>                </article>
+<h1>Common Object Oriented-based Complaints</h1>
+<p>Hopefully it is now clear that there are no clear winners when it comes to emulating multiple dispatch.  Many would have you believe, however, that the object oriented solution is a clear loser.  While it is by no means perfect, I feel many complaints are exaggerated or meaningless.</p>
+<p>Though it will be discussed why later, many of the complains about the Visitor pattern will be addressed here as well.</p>
+<h2>It Breaks Encapsulation</h2>
+<p>This argument is absolutely true.</p>
+<p>Object oriented programmer is centered around the idea that a set of data and the functions which operate on it should be packaged together.  The public interface of the object protects the data from change which might put the object into an invalid state.</p>
+<p>When we use multiple dispatch, though, we call a function which is supposed to interact with more than one type.  In other words, the function itself does not belong to any one object--rather it belongs to <strong>both objects</strong>.  Since the language does not inherently support multiple dispatch, there is usually no facility to create a function which is somehow owned by multiple objects.</p>
+<p>I really have no counter argument here, but it is important to note that none of the other methods are any better in this respect.  While the object oriented approach leverages the mechanics of objects, this does not mean that the author is attempting to shoe-horn the dispatch function into the object oriented paradigm.</p>
+<h2>You Don't Need It</h2>
+<p>The idea here is that if you're attempting to implement multiple dispatch, there is going to be some other way which is simpler/better that you just aren't using.  This is a particularly common complain when discussing the Visitor pattern (discussed later).</p>
+<p>The problem with this complaint is that it is just wrong.  Situations which require multiple dispatch <strong>really do require multiple dispatch</strong>.</p>
+<p>Most of these complaints stem from improper the abuse of the Visitor pattern.  Be very wary when reading about these--just because a person has improperly picked a pattern, and then that person later on finds a better way of solving their problem, does not mean that the initial solution is A Bad Thing that should never be used.</p>
+<h2>The Dispatch Functions Grow Combinatorially</h2>
+<p>This one is another complaint that's absolutely correct.  What drives me nuts is that it is a complaint!</p>
+<p>Consider our rock-paper-scissors game.  Without going into the math behind it (though it is very simple), you can see from our matrix that there are three possible ways to attack, for a total of nine possible game-handling function calls.  If we were to add another way to attack, we would have <strong>sixteen</strong> functions to write.</p>
+<p>In more complex games, such as any that you might find on the shelf in a store, there may be 20 or more potential entities to consider.  For 20 entities, that's up to <strong>four hundred</strong> collision handling functions.</p>
+<p>Needless to say, I can see why people freak out about this exponential growth in the number of necessary functions.  Unfortunately, <strong>that's life, deal with it</strong>.  If you have a game with 20 entities flying around, you just have to deal with them colliding.  There's no real way around it.</p>
+<p>Table-based methods have the advantage that not all cells need to be populated, but this just takes us back to the initial trade-off--an object-based design would require 400explicit function definitions, while a table based method would only require the ones that will actually ever be called (but you better hope you don't accidentally try to collide two objects that don't have a handler).</p>
+<p>I am not claiming that either approach is superior to the other, but the number of situations you need to mentally handle will grow expontentially whether you like it or not.</p>
+<h2>Open/Closed Concerns</h2>
+<p>This one is actually tricky, legitimate, and will force me to finally bridge the gap between the general case of multiple dispatch and the Visitor pattern.</p>
+<p>The rock-paper-scissors example is a special case.  In this instance, we are dispatching to two different types, each from the same group of types.  In other words, a rock, paper, or scissors will always be up against a rock, paper, or scissors.  Adding or removing a possible attack is going to cause a lot of code to shift around.  Having to chance code in classes that deal with rock/paper/scissor attacks everytime a new attack is added or removed actually makes sense, and there probably are not many people that would complain about having to do this.</p>
+<p>The types dispatched to do not always have to be from the same group, though.  A common example is that you have a group of heterogeneous types (with a common interface), and you want some way to render these.  In this case, we have two seperate groups of types which we want to dispatch to.  </p>
+<p>The usual example for this is some sort of drawing program.  For example</p>
+<p>Shapes
+<em> Circle
+</em> Square
+* Line</p>
+<p>Renderers
+<em> Win32
+</em> GTK
+* ASCII</p>
+<p>A <code>Renderer</code> would have methods which render each type of <code>Shape</code>, and each <code>Shape</code> would simply provide the secondary dispatch function (<code>renderer.visit(this)</code>).</p>
+<p>The complaint is this: adding/removing a <code>Renderer</code> is insanely easy, but adding/removing a <code>Shape</code> is insanely difficult.  Adding/removing a <code>Renderer</code> is as simple as adding or removing the class from the project.  Adding/removing a <code>Shape</code> requires that <strong>every Renderer object be modified</strong>.</p>
+<p>My guess is that this asymmetry is where a lot of the convoluted definitions and flawed understandings originate.  It is my opinion that if multiple dispatch is being used correctly, then the need to modify so many classes is ultimately justified.  In the classic Shape/Renderer example above, you would <strong>want</strong> to modify all of your renderers when a shape is added/removed.</p>                </article>
 <p class="paginator">
     Page 1 / 1
 </p>

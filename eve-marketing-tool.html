@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Writing a Trade Finder for Eve</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Douglas Thompson">
+
+    <!-- Le styles -->
+    <link rel="stylesheet" href="./theme/css/bootstrap.min.css" type="text/css" />
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+      .tag-1 {
+        font-size: 13pt;
+      }
+      .tag-2 {
+        font-size: 10pt;
+      }
+      .tag-2 {
+        font-size: 8pt;
+      }
+      .tag-4 {
+        font-size: 6pt;
+     }
+    </style>
+    <link href="./theme/css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="./theme/css/font-awesome.css" rel="stylesheet">
+
+    <link href="./theme/css/pygments.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="./theme/images/favicon.ico">
+    <link rel="apple-touch-icon" href="./theme/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="./theme/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="./theme/images/apple-touch-icon-114x114.png">
+
+    <link href="./" type="application/atom+xml" rel="alternate" title="Brainscrape ATOM Feed" />
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="./index.html">Brainscrape </a>
+          <div class="nav-collapse">
+            <ul class="nav">
+                          <li class="divider-vertical"></li>
+                  <li >
+                    <a href="./category/about.html">
+						<i class="icon-folder-open icon-large"></i>About
+					</a>
+                  </li>
+                  <li >
+                    <a href="./category/gaming.html">
+						<i class="icon-folder-open icon-large"></i>Gaming
+					</a>
+                  </li>
+                  <li class="active">
+                    <a href="./category/programming.html">
+						<i class="icon-folder-open icon-large"></i>Programming
+					</a>
+                  </li>
+
+                          <ul class="nav pull-right">
+                                <li><a href="./archives.html"><i class="icon-th-list"></i>Archives</a></li>
+                          </ul>
+
+            </ul>
+            <!--<p class="navbar-text pull-right">Logged in as <a href="#">username</a></p>-->
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="span9" id="content">
+<section id="content">
+        <article>
+                <header>
+                        <h1>
+                                <a href=""
+                                        rel="bookmark"
+                                        title="Permalink to Writing a Trade Finder for Eve">
+                                        Writing a Trade Finder for Eve
+                                </a>
+                        </h1>
+                </header>
+                <div class="entry-content">
+                <div class="well">
+<footer class="post-info">
+<span class="label">Date</span>
+<abbr class="published" title="2015-04-22T00:00:00+02:00">
+        <i class="icon-calendar"></i>Wed 22 April 2015
+</abbr>
+<span class="label">By</span>
+<a href="./author/douglas-thompson.html"><i class="icon-user"></i>Douglas Thompson</a>
+<span class="label">Category</span>
+<a href="./category/programming.html"><i class="icon-folder-open"></i>Programming</a>.
+
+
+</footer><!-- /.post-info -->                </div>
+                <p>Finding securities to scalp in Eve essentially boils down to tedious, repetative work.  Luckily, the game provides a good toolset for developers, so I set out to write a program to save some time and effort.</p>
+<h1>Spreadsheets in Space</h1>
+<p>In another article, I discussed an approach I sometimes take when trading in Eve Online.   A formula for any scalper would regularly use is the one which computs the <strong>bid-ask percentage</strong>:</p>
+<p><a href="http://www.codecogs.com/eqnedit.php?latex=100\frac{a-b}{b}" target="_blank"><img src="http://latex.codecogs.com/gif.latex?100\frac{a-b}{b}" title="100\frac{a-b}{b}" /></a></p>
+<p>I used this formula so many times that I typically mentally estimate the bid-ask spread on a security in under a second or two.</p>
+<p>There are other calculatable numbers to consider when determining whether or not to invest in a security, and it can be slow and annoying to calculate each of them for every possible candidate--there are literally thousands.</p>
+<p>A good tool to help perform many of the desired calculations quickly is the spreadsheet.  A spreadsheet can be constructed relatively quickly, and the amount of time and effort it saves is substantial.  Spreadsheets are so useful in so many Eve activities, thatt the game is sometimes called "Excel Online" or "Spreadsheets in Space".  Thus, I knew I was becoming a real Eve pro once I began to toss together spreadsheets.</p>
+<p>Sadly, the convenience of spreadsheets only goes so far.  Searching through the thousands of securities, copying and pasting in each bid/ask, and so on, is still massively annoying, slow, and repetitive.</p>
+<h1>Eve API</h1>
+<p>One of the great things about Eve Online is its support for developers.  In fact, many would argue that it is nearly impossible to play Eve without third part tools.  The programs EFT/Pyfa and EveMon are a virtual requirement to play, while tools such as Dotlan, Tripwire, Eve Central, and so on are familiar to nearly any player.</p>
+<p>Getting market data from Eve is as simple as fetching the it via a URL.  The data is provided in JSON, and from there it's as simple as tossing the numbers into whatever formulas you desire and displaying the data on the screen.</p>
+<p>Really, making a tool to do this is so simple that it is not even really worth writing about.</p>
+<h1>Thorttling</h1>
+<p>What made me want to write this article was how I decided to go about polling the API for data.  I am confident that there are better ways to go about doing this, but I though I would share what I came up with.  Any opinions and criticisms would be welcome.  Dragons ahead!</p>
+<p>Like many APIs these days, CCP has limited the number of queries it will allow clients to make.  In a perfect world, I'd simply ask the server for all orders of all securities all over New Eden every few seconds or so, and I'd work with that data.  I cannot do this, though, due to the restrictions on the use of the API.  So how do I go about eventually getting all the data, and how do I continue to update prices as the application runs in a way that would best benefit me as a trader?</p>
+<h1>Requirements</h1>
+<p>There are two basic things I was looking for.</p>
+<ul>
+<li>Need to consider the entire market</li>
+<li>Need to spend more time fetching prices for securities that I actually care about</li>
+</ul>
+<p>These two ideas actually compete to an extent.  I want to know what the spread is of <strong>everything</strong>, but at the same time, I don't want to be constantly fetching prices for things I don't care about.  I still want to fetch prices for those things <strong>sometimes</strong>, since they may eventually <strong>become</strong> something I care about, but, in general, I don't want to spend my precious price-fetching-quota on things that are usually not interesting.</p>
+<h2>Scheduling Algorithms</h2>
+<p>My first thought was to turn to the scheduling algorithms that operating systems use to determine how to divy up CPU time.  I figured this would be a slam dunk, but since we are talking about programming, it was, of course, not that simple.</p>
+<p>Scheduling algorithms <strong>seem</strong> like a good fit because they cycle through a list of jobs, and the jobs themselves are often given different priorities, or importance.</p>
+<p>Scheduling algorithms end up being an awkward fit because they seek to address a slightly different poblem.  In general, scheduling algorithms are expecting each "job" to take longer than a quantum, so they focus on sifting through a compartively (?) small number of long running jobs.  </p>
+<p>In our case, we actually have a huge number of short jobs that we can only run every once in a while, so many of the algorithms don't make much sense for us.  Our "jobs" will never actually finish, and slowly iterating through the entire list would take a very long time.  I'm not saying that the typical schedulig algorthims don't fit at all, but they weren't really what I was looking for.  There was one, though, which caught my eye.</p>
+<h2>Playing the Lottery</h2>
+<p>The lottery-based scheduling algorithm is so simple and dumb.  You simply assign a number of "tickets" to each job, then pick one of them randomly.  That job gets to run for a bit, and then the process repeats.  The reason this approach appeals to me is because it mimics what I actually do.</p>
+<p>When I find a security that I have traded successfully before, I'll trade it until it becomes unprofitable, but I'll randomly check back to see if the bid-ask spead has re-emerged.  If this happens often with a particular security, I'm more likely to check on it regularly.  If a security seems to always be a poor choice, such as with PLEX, I rarely, if ever check on it--but I'll still come back now and again and check on it just for giggles.  For other securities, I sometimes run through the listings on the market and randomly check out various things to see how their prices are doing.</p>
+<h1>Scoring</h1>
+<p>If I use the above lottery system and give each security a single ticket, then the Random Number Gods will likely eventually hit on every security.  If that's all I was interested in doing, though, I could just run through the list in alphabetical order and be done.</p>
+<p>I want to adjust the number of tickets that each secuirty gets based on how interested I am in recalculating the spread and other metrics that I use when trading.  I looked at my trading habits and realized a few things:</p>
+<ul>
+<li>Some securities I mostly ignore as they are usually bad</li>
+<li>Some securities I trade a lot, but I almost do this blindly because they're always good</li>
+<li>Some securities are good sometimes, and not good other times.</li>
+</ul>
+<p>I am not too concerned with the securities in the first two bullets.  These items are usually always good or always bad, and, as a result, I'm not usually having to plug their numbers into any spreadsheets.</p>
+<p>The last bullet is important, though.  These items often jump the fence between being good to trade and bad to trade.  One of the main reasons a security does this is because people will notice a big spread on a semi-popular security and begin to invest in it.  Because this is a semi-popular security, "regular" players will often buy and sell them and the scalpers involved can make a fair bit of dosh from them.  The popularity of the item, though, causes more competition from other traders to quickly emerge, and the security's spread collapses quickly.  Traders lose interest, the spread begins to grow again, and the process repeats.  <strong>These are the securities I want to check in on regularly</strong>.  I still want to fetch prices for the less interesting securities "just in case", but I want to fetch the prices for these interesting ones more often.</p>
+<h2>How Do?</h2>
+<p>If a security consistently displays "good" numbers, or consistently displays "bad" numbers, I want it to be checked less and less.  If a bad security begins to show good signs, or if a security constantly bounces between "good" and "bad", I want those to be checked more frequently.  I want to make sure, though, that a security always has at least <strong>some</strong> chance of being checked.</p>
+<p>Ideally, I would quickly push the securities which show consistent behavior off to the sides, but I don't want to slow down this "pushing off to the sides" as they move away from the center.  Again, I never want to push them off of the table, just a little bit further away each time.</p>
+<p>When thinking about this, I came up with two similar solutions.  I'll start with the more obvious, sensible one first, then discuss the first one that popped into my head second.</p>
+<h2>The Normal Approach</h2>
+<p>I have no idea why this did not occur to me first, but the easy solution is also the Big One. The Grand Daddy Curve of curves.  The Bell Curve.</p>
+<p>The standard normal bell curve works well for my purposes.  Each security can be given a single ticket, as their prices is checked, the ticket is adjusted to be some value along the standard normal bell curve.  For instance, a "good" security would move to the right, while a "bad" security would move to the left.  As the security receieves repeated "good" or repeated "bad" ratings, it is selected for evaluation less frequently.  Securities which regularly switch back and forth between "good" and "bad" remain closer to the middle of the curve and are selected for re-evaulation more frequently.</p>
+<p>"Good" securities, of course, will still be displayed in the program for trading, but they are not frequently reevaluated until they have shown at least a little bit of consistency.  This eliminates the problem of wasting API calls on securities which barely crossed the line into being a "good" security for a moment, only before regressing to a "bad" one.</p>
+<p>I should also note that the user has the ability to manually request a security be updated.  The above approach is mainly for updating prices over time "in the background".</p>
+                </div><!-- /.entry-content -->
+        </article>
+</section>
+        </div><!--/span-->
+
+                <div class="span3 well sidebar-nav" id="sidebar">
+<ul class="nav nav-list">
+
+<li class="nav-header"><h4><i class="icon-folder-close icon-large"></i>Categories</h4></li>
+<li>
+<a href="./category/about.html">
+    <i class="icon-folder-open icon-large"></i>About
+</a>
+</li>
+<li>
+<a href="./category/gaming.html">
+    <i class="icon-folder-open icon-large"></i>Gaming
+</a>
+</li>
+<li>
+<a href="./category/programming.html">
+    <i class="icon-folder-open icon-large"></i>Programming
+</a>
+</li>
+
+<li class="nav-header"><h4><i class="icon-tags icon-large"></i>Tags</h4></li>
+
+
+</ul>        </div><!--/.well -->
+
+      </div><!--/row-->
+
+      <hr>
+
+      <footer>
+        <address id="about">
+                Proudly powered by <a href="http://pelican.notmyidea.org/">Pelican <i class="icon-external-link"></i></a>,
+                                which takes great advantage of <a href="http://python.org">Python <i class="icon-external-link"></i></a>.
+        </address><!-- /#about -->
+
+        <p>The theme is from <a href="http://twitter.github.com/bootstrap/">Bootstrap from Twitter <i class="icon-external-link"></i></a>,
+                   and <a href="http://fortawesome.github.com/Font-Awesome/">Font-Awesome <i class="icon-external-link"></i></a>, thanks!</p>
+      </footer>
+
+    </div><!--/.fluid-container-->
+
+
+
+    <!-- Le javascript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./theme/js/jquery-1.7.2.min.js"></script>
+    <script src="./theme/js/bootstrap.min.js"></script>
+  </body>
+</html>

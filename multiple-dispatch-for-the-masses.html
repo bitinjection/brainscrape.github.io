@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Multiple Dispatch for the Masses</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Brainscrape </a></h1>
+                <nav><ul>
+                    <li><a href="/pages/multiple-dispatch-for-the-masses.html">Multiple Dispatch for the Masses</a></li>
+                    <li class="active"><a href="/category/misc.html">misc</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/multiple-dispatch-for-the-masses.html" rel="bookmark"
+           title="Permalink to Multiple Dispatch for the Masses">Multiple Dispatch for the Masses</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-03-18T00:00:00+01:00">
+                Published: Wed 18 March 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/douglas-thompson.html">Douglas Thompson</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>. </p>
+
+</footer><!-- /.post-info -->      <p>Popular modern day languages have progressed from predominatly procedural/imperative to single dispatch object oriented.  Most mainstream languages also incorporate functional and generic programming to a limited extent as well. We will worry only about the most common subset of features for this article.</p>
+<p>The most common methods of dealing with multiple dispatch using these features will be shown.  Keep in mind that these have been discovered through my own research and experience, so read through this with a critical mind, and be sure to diversify your sources on this topic.  Also, please note that the criticism sections following each approach will be loaded with the author's opinion, not actual facts.</p>
+<p>This entry will utilize two languages with which most programmers will have at least a passing familiarity: C and Java.</p>
+<p>As a final note, it is important to understand that each of these techniques are fundamentally different.  While in many cases they are interchangable, there are instances where they are not.  For example, table based solutions allow the branching logic to be modified at runtime, while switch and object based solutions do not <strong>inherently</strong> support this.</p>
+<h1>What is Multiple Dispatch?</h1>
+<p>Code is often written against abstractions.  These abstractions are helpful in the development process, but they all must eventually be resolved to a concrete type in order to do actual work.</p>
+<h2>A Single Dispatch Example</h2>
+<p>As a quick example from an object oriented language, an <code>Animal</code> abstraction may provide a <code>speak</code> method.  A programmer may write:</p>
+<div class="highlight"><pre><span class="n">animal</span><span class="o">.</span><span class="na">speak</span><span class="o">();</span>
+</pre></div>
+
+
+<p>This line of code has no real meaning, though.  If an Animal is a purely abstract object, then its <code>speak</code> method will have no actual code.  At runtime, the program will dynamically dispatch to object's underlying type and call that object's <code>speak</code> method.  In other words, if the abstract <code>animal</code> object points to an instance of <code>Dog</code> class, then the above call may print <code>woof</code> to the screen.  The above call might effectively be translated to</p>
+<div class="highlight"><pre><span class="n">dog</span><span class="o">.</span><span class="na">speak</span><span class="o">();</span>  <span class="c1">// prints &quot;woof&quot;</span>
+</pre></div>
+
+
+<p>In this case, the actual code called is determined by the underlying type of one abstraction.  One abstraction leads to a single dispatch.  The mechanism by which this (usually?) happens will be discussed in the procedural/imperative section.</p>
+<h1>A Multiple Dispatch Example</h1>
+<p>At times it my be necessary to dispatch based on multiple types.</p>
+<p>A programmer writing a game of rock-paper-scissors might use an abstraction of <code>Attacker</code> to represent a potential move.  When the actual game is played the type of both attackers will need to be known.  What we <strong>want</strong> to write is something along the lines of:</p>
+<div class="highlight"><pre><span class="o">(</span><span class="n">attacker1</span> <span class="n">and</span> <span class="n">attacker2</span><span class="o">).</span><span class="na">determineWinner</span><span class="o">();</span>
+</pre></div>
+
+
+<p>As an example, attacker1 might be resolved to <code>Rock</code> and attacker2 might be resolved to <code>Scissors</code>.  In this case, the code relating to rock beating scissors would be called.</p>
+<h1>Multiple Dispatch in C</h1>
+<p>There are two main ways to go about this in C.  Both of these involve defining types which explicitly describe themselves.  In other words, an enum may be defined as:</p>
+<div class="highlight"><pre><span class="k">enum</span> <span class="p">{</span> <span class="n">ROCK</span><span class="p">,</span> <span class="n">PAPER</span><span class="p">,</span> <span class="n">SCISSORS</span><span class="p">}</span> <span class="n">attacker</span><span class="p">;</span>
+</pre></div>
+
+
+<p>The types for each attack could be defined by:</p>
+<div class="highlight"><pre><span class="k">struct</span> <span class="p">{</span> <span class="n">attacker</span> <span class="n">TYPE</span> <span class="o">=</span> <span class="n">ROCK</span><span class="p">;</span> <span class="p">}</span>
+<span class="k">struct</span> <span class="p">{</span> <span class="n">attacker</span> <span class="n">TYPE</span> <span class="o">=</span> <span class="n">PAPER</span><span class="p">;</span> <span class="p">}</span>
+<span class="k">struct</span> <span class="p">{</span> <span class="n">attacker</span> <span class="n">TYPE</span> <span class="o">=</span> <span class="n">SCISSORS</span><span class="p">;</span> <span class="p">}</span>
+</pre></div>
+
+
+<h2>Big Switch Statement</h2>
+<p>The typically cringeworthy solution is to have a Big Switch Statement to handle every possible combination.  In psuedocode, for sanity related reasons:</p>
+<div class="highlight"><pre><span class="k">switch</span> <span class="n">attacker1</span><span class="p">.</span><span class="nl">TYPE</span><span class="p">:</span>
+  <span class="k">case</span> <span class="nl">ROCK</span><span class="p">:</span>
+    <span class="k">switch</span> <span class="n">attacker2</span><span class="p">.</span><span class="nl">TYPE</span><span class="p">:</span>
+      <span class="k">case</span> <span class="nl">ROCK</span><span class="p">:</span> <span class="n">tie</span>
+      <span class="k">case</span> <span class="nl">PAPER</span><span class="p">:</span> <span class="n">lose</span>
+      <span class="k">case</span> <span class="nl">SCISSORS</span><span class="p">:</span> <span class="n">win</span>
+  <span class="k">case</span> <span class="nl">PAPER</span><span class="p">:</span>
+    <span class="k">switch</span> <span class="n">attacker2</span><span class="p">.</span><span class="nl">TYPE</span><span class="p">:</span>
+      <span class="k">case</span> <span class="nl">ROCK</span><span class="p">:</span> <span class="n">win</span>
+      <span class="n">etc</span><span class="p">...</span>
+  <span class="n">etc</span><span class="p">...</span>
+</pre></div>
+
+
+<p>This switch statement ends up being huge, even with only three types.</p>
+<p>Beyond factoring each switch and/or case statement into its own function, the switch statement itself may be replaced with a jump table.</p>
+<h3>Criticisms</h3>
+<p>Good
+* Not <strong>too</strong> difficult to manually trace through</p>
+<p>Bad
+<em> Adding/removing types requires a lot of work which won't be verified by a compiler
+</em> Have to add a type field to all types and keep up with these
+* These switch statements tend to poliferate</p>
+<p>The first bullet under the negative criticisms is particularly important.  Adding or removing types involves modifying a lot of code spread out all over your program, and the compiler will not let you know if you have left anything out in many cases.</p>
+<h2>Big Jump Table</h2>
+<p>The logic of a switch statement or chain of if/else statements based on explicitly defined types may be replaced by a jump table.  Before diving into the code, imagine a matrix of possible outcomes for the game itself:</p>
+<table>
+<thead>
+<tr>
+<th>-</th>
+<th>Rock</th>
+<th>Paper</th>
+<th>Scissors</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Rock</strong></td>
+<td>Tie</td>
+<td>Lose</td>
+<td>Win</td>
+</tr>
+<tr>
+<td><strong>Paper</strong></td>
+<td>Win</td>
+<td>Tie</td>
+<td>Lose</td>
+</tr>
+<tr>
+<td><strong>Scissors</strong></td>
+<td>Lose</td>
+<td>Win</td>
+<td>Tie</td>
+</tr>
+</tbody>
+</table>
+<p>We can translate this into code by creating functions for every possible combination of rock-paper-scissors, then populating a table based on the intersection of the types.  Dispatching to the correct function can then be done by looking up the function pointer in the table:</p>
+<div class="highlight"><pre><span class="n">BattleFunction</span> <span class="n">generate_outcome</span> <span class="o">=</span> <span class="n">gameMatrix</span><span class="p">[</span><span class="n">attacker1</span><span class="p">.</span><span class="n">TYPE</span><span class="p">,</span> <span class="n">attacker2</span><span class="p">.</span><span class="n">TYPE</span><span class="p">];</span>
+<span class="n">generate_outcome</span><span class="p">();</span>
+</pre></div>
+
+
+<p>Maintaining the <code>TYPE</code> field in all of our objects is still a bit of a pain.  If we were to add or remove any types, we would have to edit our enum and update our matrix.</p>
+<h3>Criticisms</h3>
+<p>Good
+<em> Tables can be constructed outside of static code.  This consolidation makes modification easier and will usually not even require modification of the code itself.
+</em> Leads to simpler code.  Functions which would typically contain large switch statements simply index into a table.</p>
+<p>Bad
+<em> Much more difficult to debug/trace.
+</em> Still requires types to label themselves.</p>
+<h1>Introspection</h1>
+<p>While finding a language or environment in which introspection is unavailable is not unheard of, reflection is commonly used to help alleviate some of the issues with the C-based approaches to this problem.</p>
+<p>Instead of manually tracking each type, the underlying type of each abstraction is determined via a language's introspection features, and then the relevant code is dispatched to based on the findings.</p>
+<p>As a side note, this approach is often times discovered independently and immediatelly touted as a panacea for the ugly switch/table based methods previously described, and the also ugly double indirection used in object oriented languages.  It is my opinion that it is not.  While it does simplify some aspects of the table-based approach, it still carries many of the drawbacks associated with that method, and it introduces many of its own drawbacks in the process.  These will be detailed in the general compare/contrast of each method toward the end.</p>
+<h2>Criticisms</h2>
+<p>Good
+* Removes the need for types to keep track of themselves.</p>
+<p>Bad
+<em> Makes debugging/tracing even more painful.
+</em> While explicit tracking of types is removed, the developer must still be mentally aware of what these types are when updating tables.</p>
+<h1>Object Oriented Approach</h1>
+<p>In object oriented languages, polymorphism is the go-to mechanism for replacing branches based on type.  To implement double dispatch, then, one can first write something along the lines of:</p>
+<div class="highlight"><pre><span class="n">attacker1</span><span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="n">attacker2</span><span class="o">);</span>
+</pre></div>
+
+
+<p>This dispatches to the appropriate <code>handle</code> method based on attacker1's type.  If <code>attacker1</code> is a <code>rock</code>, for example, you could mentally translate this to:</p>
+<div class="highlight"><pre><span class="n">rock</span><span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="n">attacker2</span><span class="o">);</span>
+</pre></div>
+
+
+<p>Once we're in the Rock's <code>handle</code> method, we know we are a rock.  Now all that's left to do is figure out what attacker2 is.  We can do this in similar fasion inside of the rock.handle method:</p>
+<div class="highlight"><pre><span class="n">attacker2</span><span class="o">.</span><span class="na">handleRock</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+</pre></div>
+
+
+<p>We know that we're a <code>rock</code>, so <code>this</code> is really <code>rock</code>.  Again, if <code>attacker2</code> is <strong>actually</strong> <code>paper</code>, the call may be mentally translated to:</p>
+<div class="highlight"><pre><span class="n">paper</span><span class="o">.</span><span class="na">handleRock</span><span class="o">(</span><span class="n">rock</span><span class="o">)</span>
+</pre></div>
+
+
+<p>And in our Paper class, the handleRock method can contain the code which handles the rock versus paper interaction.</p>
+<h2>Criticisms</h2>
+<p>Good
+<em> Returns many of the potential errors to compile time
+</em> Avoids the poliferation inherent in switch-based solutions</p>
+<p>Bad
+<em> Can seem convoluted to the uninitiated
+</em> It is an object oriented solution which violates many object oriented ideas
+* Costs associated with adding/removing types vary based on which set of types you are modifying</p>
+<p>I will spend the second half of this article examining this object oriented approach, as I find it to be heavily criticized in ways which I think are unfair.  If the above bullets are not clear, feel free to read on.</p>
+<h3>Header 3</h3>
+<blockquote>
+<p>This is a blockquote.</p>
+<p>This is the second paragraph in the blockquote.</p>
+<h2>This is an H2 in a blockquote</h2>
+</blockquote>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

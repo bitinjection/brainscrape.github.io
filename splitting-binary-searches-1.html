@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Douglas Thompson" />
+        <meta name="copyright" content="Douglas Thompson" />
+
+<meta name="keywords" content="Algorithms, Mathematics, Optimization, Programming, Programming, " />
+        <title>Spitting Headaches and Binary Searches - Brainscrape
+</title>
+        <link href="http://cdn-images.mailchimp.com/embedcode/slim-081711.css" rel="stylesheet" type="text/css">
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="./theme/css/style.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="./theme/css/solarizedlight.css" media="screen">
+        <link rel="shortcut icon" href="./theme/images/favicon.ico" type="image/x-icon" />
+        <link rel="apple-touch-icon" href="./theme/images/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" sizes="57x57" href="./theme/images/apple-touch-icon-57x57.png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="./theme/images/apple-touch-icon-72x72.png" />
+        <link rel="apple-touch-icon" sizes="114x114" href="./theme/images/apple-touch-icon-114x114.png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="./theme/images/apple-touch-icon-144x144.png" />
+        <link rel="icon" href="./theme/images/apple-touch-icon-144x144.png" />
+    </head>
+    <body>
+        <div id="content-sans-footer">
+        <div class="navbar navbar-static-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="./"><span class=site-name>Brainscrape</span></a>
+                    <div class="nav-collapse collapse">
+                        <ul class="nav pull-right top-menu">
+                            <li ><a href=".">Home</a></li>
+                            <li ><a href="./pages/about-me.html">About Me</a></li>
+                            <li ><a href="./categories.html">Categories</a></li>
+                            <li ><a href="./tags.html">Tags</a></li>
+                            <li ><a href="./archives.html">Archives</a></li>
+                            <li><form class="navbar-search" action="./search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span1"></div>
+                <div class="span10">
+<article>
+<div class="row-fluid">
+    <header class="page_header span10 offset2">
+    <h1><a href="./splitting-binary-searches-1.html"> Spitting Headaches and Binary Searches  </a></h1>
+    </header>
+</div>
+
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+
+            <p>I want to put this out there now--I intend to follow this up at some point in the future with more significant insights as I still have a lot of questions about this topic.</p>
+<p>Be sure to check out the <a href="https://www.youtube.com/watch?v=2cXrsrPAbwk" title="Generatin combinations and permutations">video</a> if you have some time to kill!</p>
+<h1>The Setup</h1>
+<p>I wrote a small website for combat probing in the game Eve Online.  Without going into much detail, there is at tool in the game to locate far away players called the Directional Scanner.  This tool works <em>sort of</em> like RADAR.  You specify a distance from your ship, click "Scan", and you receive a list of ships and other objects that are within that range.</p>
+<p>For example, I might pick a range, say 7 AU (astronomical unit, one is about 150 million kilometers), and scan.  If there is a ship within 7 AU, it will be listed on my directional scanner. No additional information about it will be provided.  So we know there is a ship within 7 AU, but how can we quickly figure out <em>exactly</em> where it is in system?</p>
+<p>The typical advice given here is to use a binary search by modifying the search distance on the directional scanner.  If a ship appeared on scan, we would then shorten our scan range to 3.5 AU and repeat the process.  On the other hand, if the ship appeared on scan, we might extend the distance to 10.5 AU (the maximum dscan range being 14AU, and assuming we knew the ship was in max scan range).  Using this technique, we can quickly zero in on our target.</p>
+<p>Though it has changed in recent patches, it used to be that you had to type in the range of your scan <em>in kilometers</em>.  Manually doing math on and typing in 10 digit numbers can be time consuming (even when truncating results), error prone, and the number of "probes" that you have to do may mean the difference between life or death.  Thus, minimizing the number of iterations is vital.</p>
+<h1>Problems Searching Space</h1>
+<p>I didn't realize until much later, but there is a problem with the approach of splitting the seach <em>range</em> in half each iteration.</p>
+<p>The directional scanner searches a <em>space</em> within <em>x</em> kilometers of the ship.  The space it spans forms a sphere around the ship.  The thing is, <em>the radius of a sphere and its volume do no vary linearly</em>.</p>
+<p>To illustrate this, let's take a simpler example and use a circle.  The radius of a circle is related to the area of a circle by the formula:</p>
+<p>a = &pi; r ^ 2</p>
+<p>Continuing with our concrete example, the area of a circle with radius 14 is 196&pi;, while the radius of a circle with radius 7 is 49&pi;.  In other words, we reduced our search area to one fourth instead of halving it!  Since cutting the search space in half is the basis for how the binary search actually works, this might be a problem.  In order to actually halve the search area, we need to take half of the <em>area</em>, not the radius, and then figure out what the radius for that given area is.  It seems obvious, but trust me when I say that nobody in Eve Online recognizes this problem.</p>
+<p>If you would like a little bit more detail on this process, be sure to check out the associated <a href="https://www.youtube.com/watch?v=2cXrsrPAbwk" title="Generatin combinations and permutations">video</a>.</p>
+<h1>Why Did This Happen?</h1>
+<p>There is actually a deeper problem here.  When we use the radius of the circle/sphere as our search criteria, the actual search space grows exponentially.  In other words, the search space is not really uniformly distributed.  This is an assumption that the binary search makes, but is this something that we can generally rely on?  And how much does it really matter?</p>
+<p>As an anology that might be more relevant, let's take the <em>very common case</em> where we have some data that is distibuted normally instead of uniformly.  Suppose we have a bunch of SAT scores from high school students to search through.  If we wanted to find students with scores of 2100 we might use a binary search to do this.  There is a significant problem with this approach, though.  We assume the SAT's normally distributed scores are centered at a score of 1500.  If we make our first split at 1500, everything is great.  Half of the students are below or at 1500, the other half are above or at 1500.  Since we're searching for 2100, we'll hop to the middle of the upper half.  Though the upper half of the curve technically has no upper bound, the test itself tops out at 2400.  This makes our midpoint for the 1500-2400 range 1950.  And this is where the trouble starts.</p>
+<p>The normal distribution for actual SAT scores might look like this: Mean 1500, Standard Deviation 300.  In such a case, SAT scores between 1500 and 1950 will comprise 86.64% of the remaining scores, while the scores between 1950 and 2400 will only contain 13.36%!  This isn't even close to what we were going for.</p>
+<p>Though I have not messed with them, there are methods for transforming a normal distribution into a uniform one.  I suspect that this may be what you want to consider doing if you had, for instance, a normal distribution of data to search through.</p>
+<h1>Back to Outer Space</h1>
+<p>For my small Eve Online tool, I realized that this sort of thing was causing problems.  I immediately changed the searching algorithm to the 3D version.  I soon realized that, despite Eve being a fully 3D game, many of the systems in game are essentially laid out on a 2D plane.  It was also often that I knew the direction of a particular target, and only wanted to find how far away they were--further reducing the dimensions of the problem to one.  As such, I stuck in 3 different options for performing the search:  one dimensional (line), two dimensional (circle), and three dimensional (sphere).</p>
+<h1>Conclusions</h1>
+<p>Sadly, I am left with more questions than answers at this point.  While writing the program, I was happy with having the option to select the appropriate search criteria based on the problem at hand.  When writing this article, however, I suddenly am faced with finding answers of a more general nature.  I spent a little bit of time searching for other people's experiences with this problem, but ultimately came up with little insight.  I think that many people feel the binary search still finds a solution fast enough such that the overhead/complexity of optimizing the search is not worth it.  I do realize that this sort of thing can be seen as an unnecessary obsession over an optimization, but non uniform distributions are so common that I still feel like it's worth investigating--for science!</p>
+<p>When I have more time, I will be sure to look into this more and write up a part 2, but of course if anyone has any knowledge they wish to impart upon me, be sure to do so!</p>
+            <aside>
+            <nav>
+            <ul class="articles_timeline">
+ 
+                <li class="previous_article">« <a href="./combinations-without-replacement.html" title="Previous: Combinations without Replacement">Combinations without Replacement</a></li>
+            </ul>
+            </nav>
+            </aside>
+        </div>
+        <section>
+        <div class="span2" style="float:right;font-size:0.9em;">
+ 
+            <h4>Published</h4>
+            <time pubdate="pubdate" datetime="2015-09-21T00:00:00+02:00">Sep 21, 2015</time>
+            <h4>Category</h4>
+            <a class="category-link" href="/categories.html#Programming-ref">Programming</a> 
+            <h4>Tags</h4>
+            <ul class="list-of-tags tags-in-article"> 
+                <li><a href="/tags.html#Algorithms-ref">Algorithms
+                    <span>2</span>
+</a></li>
+                <li><a href="/tags.html#Mathematics-ref">Mathematics
+                    <span>2</span>
+</a></li>
+                <li><a href="/tags.html#Optimization-ref">Optimization
+                    <span>2</span>
+</a></li>
+                <li><a href="/tags.html#Programming-ref">Programming
+                    <span>2</span>
+</a></li>
+            </ul>
+
+        </div>
+        </section>
+    </div>
+    </article>
+                </div>
+                <div class="span1"></div>
+            </div>
+        </div>
+    </div>
+<footer>
+<div id="footer">
+    <ul class="footer-content">
+        <li class="elegant-power">Powered by <a href="http://getpelican.com/" title="Pelican Home Page">Pelican</a>. Theme: <a href="http://oncrashreboot.com/pelican-elegant" title="Theme Elegant Home Page">Elegant</a> by <a href="http://oncrashreboot.com" title="Talha Mansoor Home Page">Talha Mansoor</a></li>
+    </ul>
+</div>
+</footer>            <script src="http://code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+
+    </body>
+</html>

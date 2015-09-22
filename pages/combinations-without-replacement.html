@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Combinations without Replacement</title>
+        <link rel="stylesheet" href="../theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="../">Brainscrape </a></h1>
+                <nav><ul>
+    
+                        <li><a href="../pages/about-me.html">About Me</a></li>
+    
+                        <li class="active"><a href="../pages/combinations-without-replacement.html">Combinations without Replacement</a></li>
+    
+                        <li><a href="../pages/multiple-dispatch.html">Multiple Dispatch</a></li>
+    
+                        <li><a href="../pages/splitting-binary-searches-1.html">Spitting Headaches and Binary Searches</a></li>
+                </ul>
+                </nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <h1 class="entry-title">Combinations without Replacement</h1>
+    
+    <h1>Algorithm for Generating Combinations without Replacement</h1>
+<p>The algorithm this article is based around is nearly trivial, but it was something that tripped me up for a long time.  Thus, I feel compelled to write an article, but I also feel compelled to make it short (well, relatively speaking).</p>
+<p>If you want a brief, but more technical overview, be sure to check out the associated YouTube video!  The simple algorithm and boring, abstract problem belie the much more widely applicable nature of the generalized problem.</p>
+<h1>The Problem</h1>
+<p>Sometimes you have a collection of things, and you want to select each of the things from the collection, one at a time, in some random order.  You <em>don't</em> want to take the same element twice, however.  How do you end up handling this in an effective way?</p>
+<h1>The Easy Soltion</h1>
+<p>One easy way to approach this problem is to simpy remove each element from the collection as you come across them, but which data structure would you use to do this?</p>
+<p>You could use a resizable array, but each time you remove an element on average n/2 elements will need to be "shuffled down" in order to ensure the array is contiguous.  This can be an actual serious problem even on modern computers in many cases.</p>
+<p>You could use a linked list, but then you'd have to transverse, on average, n/2 elements on average every iteration to find the item to remove.</p>
+<p>A hash table might be suitable, but there's a good chance your data isn't in this format already, and you have to deal with the potentially substantial overheads associated with this.</p>
+<h1>The Good Solution</h1>
+<p>It turns out that there is a really simple solution to this problem which has nearly no drawbacks with respect to performance or memeory.  It works like this:</p>
+<ol>
+<li>Manually maintain an index into the array</li>
+<li>Randomly (or however) select an element</li>
+<li>Swap this element with the last one in the array</li>
+<li>Decrement the index</li>
+<li>Return array[index]</li>
+</ol>
+<h1>Analysis</h1>
+<p>Should you use this algorithm?  I recently used it in a small program I wrote for finding scalping opportunities in the video game Eve Online.  But should I have?  This is a much harder question to answer.</p>
+<h2>This algorithm is <em>dead simple</em></h2>
+<p>The thing that strikes me the most about this algorithm is that it is insanely simple.  Simply removing the selected element from the list is nearly as difficult!  In fact, there is a commonly used C++ idiom, "swap and pop", which leverages this exact same mechanic for nearly the same reason.</p>
+<h2>In today's world, this would usually be considered a vomit inducing micro-optimization</h2>
+<p>Most application programmers live in a world of immutable/persistent data structures and defensive copying.  The idea that an algorithm like this would ever see use in general is probably laughable to most programmers.  In particular, the program that I wrote would select an item at most once every 30 seconds.  Is this sort of optimization needed <em>at all</em>?  Obviously not.</p>
+<p>Luckily, in my own side projects I get to do whatever I want!</p>
+<p>Again, be sure to check out the associated YouTube video if you can stand it.  This algorithm address one solution to a larger class of problems which you probably encounter on a daily basis.</p>
+</section>
+        <section id="extras" class="body">
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <p>Powered by <a href="http://getpelican.com/">Pelican</a>. Theme <a href="https://github.com/blueicefield/pelican-blueidea/">blueidea</a>, inspired by the default theme.</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
